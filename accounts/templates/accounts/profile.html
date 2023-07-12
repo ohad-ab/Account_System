@@ -1,0 +1,28 @@
+{% extends 'accounts/master.html' %}
+
+{% block title %}{{otheruser.username}}{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+    {% if not otheruser.is_staff or user.is_staff %}
+    <h1>{{otheruser.username}}</h1>
+    <p>Birthdate: {{otheruser.birth_date}}</p>
+        {% if user.username != otheruser.username %}
+            <p>bio: {{otheruser.bio}}</p>
+            <p>Location: {{otheruser.location}}</p>
+        {% else %}
+        <form action="." method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type='submit' value='Update' /><br>
+            <a href="{% url 'home' %}">Return to homepage </a>
+        {% endif %}
+    {%else%}
+            <p>You are not authorized to view this page.</p>
+    {% endif %}
+
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a>
+{% endif %}
+{% endblock %}

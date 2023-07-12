@@ -1,0 +1,12 @@
+{% extends 'accounts/master.html' %}
+
+{% block content %}
+
+{% for instance in object_list %}
+    {% if instance.is_authenticated %}
+    <a href='{{instance.get_absolute_url}}'>{{instance.username}} </a><br>
+    {% endif %}
+{% endfor %}
+
+
+{% endblock %}
