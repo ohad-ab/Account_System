@@ -8,6 +8,7 @@ class User(AbstractUser):
     birth_date = models.DateField(null=True, blank=True)
     friends = models.ManyToManyField("User", blank=True)
     slug = models.SlugField(default="", null=False)
+    
 # Create your models here.
 
 class Friend_Request(models.Model):
