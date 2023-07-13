@@ -1,0 +1,16 @@
+{% extends 'accounts/master.html' %}
+
+{% block content %}
+{% for instance in requests %}
+{% if instance.to_user == user %}
+<form action="" method="POST">
+    {%csrf_token%}
+    {{instance.from_user}}
+    <button type='submit' name="accept" value={{instance.id}}>accept
+        </button><br>
+    </form>
+    {% endif %}
+{% endfor %}
+
+
+{% endblock %}

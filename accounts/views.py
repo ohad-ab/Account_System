@@ -1,9 +1,9 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from accounts.forms import SignupForm, UpdateForm
 from django.views import generic
-from accounts.models import User
+from accounts.models import User, Friend_Request
 from django.views import View
 from django.forms.models import model_to_dict
 
@@ -22,12 +22,16 @@ class UserProfileView(View):
     template_name = "accounts/profile.html"
     
     def get(self, request, slug):
-        otheruser = User.objects.get(slug=slug)
+        otheruser = get_object_or_404(User, slug=slug)
+        is_friend = False
+        if otheruser.friends.contains(request.user):
+            is_friend = True
         if otheruser is not None:
             form = UpdateForm(instance=otheruser)
             context = {
                 'otheruser': otheruser,
-                'form': form
+                'form': form,
+                'is_friend': is_friend,
             }
         return render(request, self.template_name, context)
     
@@ -55,3 +59,45 @@ class UsersListView(generic.ListView):
     def get(self, request, *args, **kwargs):
         context = {'object_list': self.get_queryset()}
         return render(request, self.template_name, context)
+    
+class SendFriendRequest(View):
+    template_name = 'accounts/friend_request.html'
+
+    def get(self, request, slug):
+        from_user = request.user
+        to_user = User.objects.get(slug=slug)
+        if(from_user.is_authenticated and to_user is not None):
+            context = {'to_user':to_user}
+            if to_user.friends.contains(from_user):
+                context['message'] = f"You are already friends with {to_user.username}."
+                return render(request, self.template_name, context)
+            else:
+                object, created = Friend_Request.objects.get_or_create(from_user=from_user, to_user=to_user)
+                
+                if created:
+                    context['message'] = f"Friend request sent to {to_user.username}."
+                    return render(request, self.template_name, context)
+                else:
+                    context['message'] = f"Friend request was already sent to {to_user.username}"
+                    return render(request, self.template_name, context)
+        else:
+            return reverse_lazy('login')
+
+class accept_friend_request(View):
+    template_name = "accounts/friend_request_list.html"
+
+    def get(self,request):
+            friend_requests = Friend_Request.objects.all()
+            context = {'requests': friend_requests}
+            return render(request, self.template_name ,context)
+    
+    def post(self, request):
+        current_user = request.user
+        request_ID = request.POST['accept']
+        friend_request = Friend_Request.objects.get(id=request_ID)
+        other_user = friend_request.from_user
+        current_user.friends.add(other_user)
+        other_user.friends.add(current_user)
+        friend_request.delete()
+        return HttpResponseRedirect("/profiles/"+current_user.slug)
+

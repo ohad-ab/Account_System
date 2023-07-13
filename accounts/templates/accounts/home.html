@@ -5,9 +5,13 @@
 {% block content %}
 {% if user.is_authenticated %}
   Hi {{ user.username }}!
+  {%url 'profile' user as the_url%}
+  <p><a href={{the_url}}> To your profile </a><br></p>
+  <p><a href="{% url 'user-list' %}"> User list </a><br></p>
   <p><a href="{% url 'logout' %}">Log Out</a></p>
 {% else %}
   <p>You are not logged in</p>
-  <a href="{% url 'login' %}">Log In</a>
+  <a href="{% url 'login' %}">Log In</a><br>
+  <a href="{% url 'signup' %}">Sign up</a>
 {% endif %}
 {% endblock %}

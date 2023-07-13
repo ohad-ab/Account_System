@@ -10,13 +10,22 @@
         {% if user.username != otheruser.username %}
             <p>bio: {{otheruser.bio}}</p>
             <p>Location: {{otheruser.location}}</p>
+            {% if not is_friend %}
+                {%url 'friend-request' otheruser.username as the_url%}
+                <a href={{the_url}}> Send friend request </a><br>
+            {% endif %}
         {% else %}
         <form action="." method="POST">
             {% csrf_token %}
             {{ form.as_p }}
             <input type='submit' value='Update' /><br>
-            <a href="{% url 'home' %}">Return to homepage </a>
+            <h4>friends:</h4>
+            {% for friend in user.friends.all %}
+                {%url 'profile' friend as the_url%} 
+                <p><a href={{the_url}}> {{friend}} </a><br></p> 
+                {% endfor %}           
         {% endif %}
+        <a href="{% url 'home' %}">Return to homepage </a>
     {%else%}
             <p>You are not authorized to view this page.</p>
     {% endif %}
