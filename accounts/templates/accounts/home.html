@@ -5,6 +5,42 @@
 {% block content %}
 {% if user.is_authenticated %}
   Hi {{ user.username }}!
+
+  <form id="form">
+    <input type="text" name="message"/>
+  </form>
+
+  <div id="messages"></div>
+
+  <script type="text/javascript">
+    let url = `ws://${window.location.host}/ws/socket-server/`
+
+    const chatSocket = new WebSocket(url)
+
+    chatSocket.onmessage = function(e){
+      let data = JSON.parse(e.data)
+      console.log('Data:', data)
+
+      if(data.type === 'chat'){
+        let messsages = document.getElementById('messages')
+
+        messsages.insertAdjacentHTML('beforeend', `<div>
+              <p>${data.message}</p>
+          </div>`)
+      }
+    }
+
+    let form = document.getElementById('form')
+    form.addEventListener('submit',(e)=>{
+      e.preventDefault()
+      let message = e.target.message.value
+      chatSocket.send(JSON.stringify({
+        'message': message
+      }))
+      form.reset()
+    })
+  </script>
+
   {%url 'profile' user as the_url%}
   <p><a href={{the_url}}> To your profile </a><br></p>
   <p><a href="{% url 'user-list' %}"> User list </a><br></p>
