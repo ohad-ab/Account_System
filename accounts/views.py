@@ -100,4 +100,9 @@ class accept_friend_request(View):
         other_user.friends.add(current_user)
         friend_request.delete()
         return HttpResponseRedirect("/profiles/"+current_user.slug)
+    
+def room(request, room_name):
+    return render(request, 'accounts/chat_room.html', {
+        'room_name': room_name
+    })
 

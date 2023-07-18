@@ -23,7 +23,7 @@
             {% for friend in user.friends.all %}
                 {%url 'profile' friend as the_url%} 
                 <p><a href={{the_url}}> {{friend}} </a><br></p> 
-                {% endfor %}           
+            {% endfor %}           
         {% endif %}
         <a href="{% url 'home' %}">Return to homepage </a>
     {%else%}

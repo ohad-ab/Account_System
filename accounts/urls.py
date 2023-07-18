@@ -8,4 +8,5 @@ urlpatterns = [
     path('user-list/', views.UsersListView.as_view(), name="user-list"),
     path('friend_request/<slug:slug>/', views.SendFriendRequest.as_view(), name="friend-request"),
     path('friend_request_list', views.accept_friend_request.as_view(), name="accept-request"),
+    path('chat/<str:room_name>/',views.room, name='room')
 ]

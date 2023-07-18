@@ -1,0 +1,53 @@
+{% extends 'accounts/master.html' %}
+{% block title %}
+{{room_name}}
+{% endblock %}
+
+{% block content %}
+{%if user.is_authenticated %}
+<textarea id="chat-text" rows="30" cols="50" readonly></textarea><br>
+<form id="form">
+    
+    message:<br>
+    <textarea id="input-text"  rows="4" cols="50"></textarea><br>
+    <input type="button" id="submit" value="Submit">
+  </form>
+
+  <div id="messages"></div>
+    {{ room_name|json_script:"room-name" }}
+    {{user.username|json_script:"username"}}
+  <script type="text/javascript">
+
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+    const userName = JSON.parse(document.getElementById('username').textContent);
+
+    let url = `ws://${window.location.host}/ws/socket-server/${roomName}/`
+
+    const chatSocket = new WebSocket(url)
+
+    chatSocket.onmessage = function(e){
+      let data = JSON.parse(e.data)
+      console.log('Data:', data)
+
+      if(data.type === 'chat'){
+        let messsages = document.getElementById('chat-text')
+
+        messsages.insertAdjacentHTML('beforeend',data.username +": "+ data.message+'\n')
+         }
+    }
+
+            document.querySelector("#submit").onclick = function (e) {
+            const messageInputDom = document.querySelector("#input-text");
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'username': userName,
+                
+            }));
+            messageInputDom.value = '';
+        };
+
+  </script>
+
+{% endif %}
+{% endblock %}
