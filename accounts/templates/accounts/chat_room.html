@@ -14,6 +14,13 @@
   </form>
 
   <div id="messages"></div>
+  
+  <P>Participants:<br>
+    {% for chat_user in room.users.all %}
+    {%url 'profile' chat_user.username as the_url%}
+    <a href={{the_url}}> {{chat_user.username}} </a><br>
+    {% endfor %}
+  </P>
     {{ room_name|json_script:"room-name" }}
     {{user.username|json_script:"username"}}
   <script type="text/javascript">
@@ -28,14 +35,27 @@
     chatSocket.onmessage = function(e){
       let data = JSON.parse(e.data)
       console.log('Data:', data)
+      let messsages
+      switch(data.type){
+        case 'chat':
+          messsages = document.getElementById('chat-text')
 
-      if(data.type === 'chat'){
-        let messsages = document.getElementById('chat-text')
-
-        messsages.insertAdjacentHTML('beforeend',data.username +": "+ data.message+'\n')
-         }
+          messsages.insertAdjacentHTML('beforeend',data.username +": "+ data.message+'\n')
+         break;
+        case 'enter':
+          messsages = document.getElementById('chat-text')
+          messsages.insertAdjacentHTML('beforeend',data.username + " has entered the chat\n")
+          document.getElementById('chat-users').innerHTML = ("{% for chat_user in room.users.all %}\n{%url 'profile' chat_user.username as the_url%}\n<a href={{the_url}}> {{chat_user.username}} </a><br>\n{% endfor %}\n")
+          
+        break;
+        case 'exit':
+          messsages = document.getElementById('chat-text')
+          messsages.insertAdjacentHTML('beforeend',data.username + " has exited the chat\n")
+          break;
+      
     }
-
+  }
+          
             document.querySelector("#submit").onclick = function (e) {
             const messageInputDom = document.querySelector("#input-text");
             const message = messageInputDom.value;

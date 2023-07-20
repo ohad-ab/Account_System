@@ -14,3 +14,7 @@ class User(AbstractUser):
 class Friend_Request(models.Model):
     from_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='from_user', on_delete=models.CASCADE)
     to_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='to_user', on_delete=models.CASCADE)
+
+class Chat_Users(models.Model):
+    name = models.CharField(max_length=30)
+    users = models.ManyToManyField("User", blank=True)

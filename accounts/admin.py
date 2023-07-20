@@ -1,6 +1,6 @@
 from django.contrib.auth.admin import UserAdmin
 from django.contrib import admin
-from accounts.models import User, Friend_Request
+from accounts.models import User, Friend_Request, Chat_Users
 
 # Register your models here.
 class MyUserAdmin(UserAdmin):
@@ -15,3 +15,4 @@ class MyUserAdmin(UserAdmin):
 
 admin.site.register(User, MyUserAdmin)
 admin.site.register(Friend_Request)
+admin.site.register(Chat_Users)

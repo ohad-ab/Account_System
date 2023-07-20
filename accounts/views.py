@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from accounts.forms import SignupForm, UpdateForm
 from django.views import generic
-from accounts.models import User, Friend_Request
+from accounts.models import User, Friend_Request, Chat_Users
 from django.views import View
 from django.forms.models import model_to_dict
 
@@ -102,7 +102,18 @@ class accept_friend_request(View):
         return HttpResponseRedirect("/profiles/"+current_user.slug)
     
 def room(request, room_name):
-    return render(request, 'accounts/chat_room.html', {
-        'room_name': room_name
-    })
+    
+    try:
+        creator = User.objects.get(username=room_name)
+    except:
+        creator = None
+    if(room_name == 'main' or creator is not None):
+        chat_room,created = Chat_Users.objects.get_or_create(name=room_name)       
+        return render(request, 'accounts/chat_room.html', {
+            'room_name': room_name,
+            'room':chat_room,
+            'creator': creator
+        })
+    return HttpResponse("You are not Authorized")
+    
 
