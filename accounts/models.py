@@ -8,6 +8,7 @@ class User(AbstractUser):
     birth_date = models.DateField(null=True, blank=True)
     friends = models.ManyToManyField("User", blank=True)
     slug = models.SlugField(default="", null=False)
+    chats = models.ManyToManyField("Chat_Users", blank=True)
     
 # Create your models here.
 
@@ -18,3 +19,4 @@ class Friend_Request(models.Model):
 class Chat_Users(models.Model):
     name = models.CharField(max_length=30)
     users = models.ManyToManyField("User", blank=True)
+    permitted_users = models.ManyToManyField("User", related_name="permitted_users", blank=True)

@@ -108,7 +108,12 @@ def room(request, room_name):
     except:
         creator = None
     if(room_name == 'main' or creator is not None):
-        chat_room,created = Chat_Users.objects.get_or_create(name=room_name)       
+        chat_room,created = Chat_Users.objects.get_or_create(name=room_name) 
+        if creator is not None and creator.username != request.user.username:
+            permitted = chat_room.permitted_users.contains(request.user)
+            if(not permitted):
+                return HttpResponse("You are not Authorized")
+      
         return render(request, 'accounts/chat_room.html', {
             'room_name': room_name,
             'room':chat_room,
@@ -116,4 +121,10 @@ def room(request, room_name):
         })
     return HttpResponse("You are not Authorized")
     
+def chat_invite(request, username):
+    from_user = request.user
+    to_user = User.objects.get(username=username)
+    chat, var = Chat_Users.objects.get_or_create(name=from_user.username)
+    chat.permitted_users.add(to_user)
+    return HttpResponseRedirect('/user-list/')
 

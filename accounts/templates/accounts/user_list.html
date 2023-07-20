@@ -4,7 +4,15 @@
 
 {% for instance in object_list %}
     {%url 'profile' instance.username as the_url%}
-    <a href={{the_url}}> {{instance.username}} </a><br>
+    <a href={{the_url}}> {{instance.username}} </a>
+    {% if user.username != instance.username %}
+    {%url 'chat-invite' instance.username as invite_url%}
+       
+    <!-- {{invite_url}}
+    <button onclick="location.href='{{invite_url}}'" type="button">
+        www.example.com</button> -->
+    <a href="{{invite_url}}">invite</a>
+    {% endif %}<br>
 {% endfor %}
 
 
